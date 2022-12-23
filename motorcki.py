@@ -17,9 +17,11 @@ class DCMotor:
 
     def start(self):
         self.pwm.start(self.pwm_duty)
+        return self
 
     def stop(self):
         self.pwm.stop()
+        return self
 
     def set_speed(self, speed):
         """ set speed to integer in [-100:100], negative means backward"""
@@ -31,28 +33,32 @@ class DCMotor:
             self.s1_state = False
             self.s2_state = True
         self.pwm.ChangeDutyCycle(self.pwm_duty)
+        return self
+
+def main():
+    motor_left = DCMotor(pwm_pin=22, hbridge_sw1_pin=25, hbridge_sw2_pin=8)
+    motor_right = DCMotor(pwm_pin=10, hbridge_sw1_pin=23, hbridge_sw2_pin=24)
+
+    motor_left.start()
+    motor_left.set_speed(20)
+    time.sleep(2)  # let it run 2 seconds
+    motor_left.stop()
+
+    time.sleep(2)  # quiet 2 seconds
+
+    motor_left.start()  # see if it remembered pwm duty cycle from last run
+    time.sleep(2)  # let it run 2 seconds
+    motor_left.stop()
 
 
-motor_left = DCMotor(pwm_pin=22, hbridge_sw1_pin=25, hbridge_sw2_pin=8)
-motor_right = DCMotor(pwm_pin=10, hbridge_sw1_pin=23, hbridge_sw2_pin=24)
+    GPIO.cleanup()
 
-motor_left.start()
-motor_left.set_speed(20)
-time.sleep(2)  # let it run 2 seconds
-motor_left.stop()
+    # todo: implement direction setting
+    # GPIO.output(25, True)
+    # GPIO.output(8, False)
+    # GPIO.output(23, True)
+    # GPIO.output(24, False)
 
-time.sleep(2)  # quiet 2 seconds
-
-motor_left.start()  # see if it remembered pwm duty cycle from last run
-time.sleep(2)  # let it run 2 seconds
-motor_left.stop()
-
-
-GPIO.cleanup()
-
-# todo: implement direction setting
-# GPIO.output(25, True)
-# GPIO.output(8, False)
-# GPIO.output(23, True)
-# GPIO.output(24, False)
-
+    
+if __name__ == "__main__":
+    main()
